@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
+import UserManu from "../auth/user-manu";
+import ThemeToggle from "../theme/theme-toggle";
 
 interface NavItem {
   label: string;
@@ -14,9 +17,9 @@ export default function Header() {
     const router = useRouter()
   const navItems: NavItem[] = [
     { label: "Home", href: "/" },
-    { label: "Create Post", href: "/post/create" },
-    { label: "Profile", href: "/profile" },
   ];
+
+  const {data:session, isPending} = useSession()
 
   return (
     <header className="border-b sticky top-0 z-10  shadow-xl">
@@ -40,16 +43,21 @@ export default function Header() {
             ))}
           </nav>
         </div>
+        
         <div className=" flex items-center gap-4">
             <div className=" hidden md:block ">
                 {/* keep it of search */}
             </div>
-            {/* fortheme toggle */}
-            <div className=" flex items-center gap-2">
-                <Button className=" cursor-pointer" onClick={()=>router.push('/auth')}>
-                    Login
-                </Button>
-            </div>
+            <ThemeToggle/>
+            {
+              isPending ? null : session?.user ? <UserManu user={session?.user}/> : 
+              <div className=" flex items-center gap-2">
+                  <Button className=" cursor-pointer" onClick={()=>router.push('/auth')}>
+                      Login
+                  </Button>
+              </div>
+            }
+            
         </div>
       </div>
     </header>
