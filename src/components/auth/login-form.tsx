@@ -3,8 +3,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {z} from 'zod'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
+import { signIn } from '@/lib/auth-client'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 //schema 
 
 const loginSchema = z.object({
@@ -15,6 +18,8 @@ const loginSchema = z.object({
 type LoginFormvalues = z.infer<typeof loginSchema>
 
 export default function Login() {
+
+    const router = useRouter()
 
     const [isloading ,setIsloading] = useState(false);
 
@@ -27,13 +32,30 @@ export default function Login() {
         }
     })
 
-    const onSubmit = async (data: LoginFormvalues) => {
-        console.log(data);
+    const onSubmit = async (values: LoginFormvalues) => {
+        setIsloading(true)
+        try {
+            const {error} = await signIn.email({
+                email : values.email,
+                password : values.password,
+                rememberMe : true
+            })
+
+            if(error) {
+                toast.error("Login failed!")
+            }
+            toast.success("login success")
+            router.push('/')
+            console.log(values); 
+        } catch (error) {
+            console.log(error);
+            setIsloading(false)
+        }
     };
 
 
     return <Form {...form}>
-            <form className='space-y-4'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
                 <FormField
                     control={form.control}
                     name="email"
@@ -43,6 +65,7 @@ export default function Login() {
                             <FormControl>
                                 <Input placeholder='Enter your email' {...field}/>
                             </FormControl>
+                            <FormMessage/>
                         </FormItem>  
                     )}
                 />
@@ -53,8 +76,9 @@ export default function Login() {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input type='password' placeholder='Enter your passeord' {...field}/>
+                                <Input type='password'  placeholder='Enter your passeord' {...field}/>
                             </FormControl>
+                             <FormMessage/>
                         </FormItem>
                     )}
                 />
@@ -65,8 +89,6 @@ export default function Login() {
                     >
                     {isloading ? "Loading..." : "Sign in"}
                     </button>
-                
             </form>
-            
     </Form>
 }

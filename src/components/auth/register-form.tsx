@@ -3,8 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
+import { signUp } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 const registerSchema = z
   .object({
@@ -22,7 +24,11 @@ const registerSchema = z
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function Register() {
+interface RegisterFromPros{
+  onSuccess? : () => void
+}
+
+export default function Register({onSuccess} : RegisterFromPros) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<RegisterFormValues>({
@@ -35,8 +41,27 @@ export default function Register() {
     },
   });
 
-  const onSubmit = async (data: RegisterFormValues) => {
-    console.log(data);
+  const onSubmit = async (values: RegisterFormValues) => {
+    setIsLoading(true)
+    try {
+      const {error} = await signUp.email({
+        name : values.name,
+        email : values.email,
+        password : values.password
+      })
+      if(error){
+        toast.error("failed to create account! , please try again");
+        return
+      }
+       toast.error("Your account is created successfully. please sing with email and password");
+       if(onSuccess){
+        onSuccess()
+       }
+
+    } catch (error) {
+        console.log(error);
+         setIsLoading(false)
+    }
   };
 
   return (
@@ -54,6 +79,7 @@ export default function Register() {
               <FormControl>
                 <Input placeholder="Enter your name" {...field} />
               </FormControl>
+                <FormMessage/>
             </FormItem>
           )}
         />
@@ -67,6 +93,7 @@ export default function Register() {
               <FormControl>
                 <Input placeholder="Enter your email" {...field} />
               </FormControl>
+               <FormMessage/>
             </FormItem>
           )}
         />
@@ -80,6 +107,7 @@ export default function Register() {
               <FormControl>
                 <Input type="password" placeholder="Enter your password" {...field} />
               </FormControl>
+               <FormMessage/>
             </FormItem>
           )}
         />
@@ -97,6 +125,7 @@ export default function Register() {
                   {...field}
                 />
               </FormControl>
+               <FormMessage/>
             </FormItem>
           )}
         />
