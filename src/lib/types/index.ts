@@ -5,6 +5,7 @@ export interface PostListProps{
         id : number;
         title : string;
         description : string;
+        content : string;
         slug : string;
         createdAt : Date;
         author : {
@@ -18,6 +19,7 @@ export interface PostCardProps {
         id : number;
         title : string;
         description : string;
+        content : string;
         slug : string;
         createdAt : Date;
         author : {
@@ -32,6 +34,7 @@ export interface PostcontentProps{
         id : number;
         title : string;
         description : string;
+        content : string;
         slug : string;
         createdAt : Date;
         updatedAt : Date;
@@ -41,4 +44,8 @@ export interface PostcontentProps{
       
     } ,
     isAuthor : boolean
+}
+
+export interface DeletePostButtonProps {
+    postId : number
 }
