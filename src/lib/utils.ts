@@ -13,3 +13,12 @@ export function slugify(text: string): string {
     .replace(/\s+/g, '-')    // replace spaces with hyphens
     .trim();                 // remove any extra hyphens/spaces
 }
+
+
+export function formateDate(data :Date) :string{
+  return new Intl.DateTimeFormat('en-US',{
+    month : 'long',
+    day : 'numeric',
+    year : 'numeric'
+  }).format(data)
+}
